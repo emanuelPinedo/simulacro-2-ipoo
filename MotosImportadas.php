@@ -3,8 +3,8 @@ class MotosImportadas extends Moto{
     private $paisImporta;
     private $importeIngreso;
 
-    public function __construct($vCodigo,$vCosto,$vAnioFabric,$vDescripcion,$vPorcIncAnual,$vActiva,$paisImporta,$importeIngreso){
-        parent::__construct($vCodigo,$vCosto,$vAnioFabric,$vDescripcion,$vPorcIncAnual,$vActiva);
+    public function __construct($vCodigo, $vCosto, $vAnioFabric, $vDescripcion, $vPorcIncAnual, $vActiva, $paisImporta, $importeIngreso){
+        parent::__construct($vCodigo, $vCosto, $vAnioFabric, $vDescripcion, $vPorcIncAnual, $vActiva);
         $this->paisImporta = $paisImporta;
         $this->importeIngreso = $importeIngreso;
     }
@@ -26,7 +26,11 @@ class MotosImportadas extends Moto{
     }
 
     public function darPrecioVenta(){
-        return parent::darPrecioVenta() * ( 1 + $this->getImporteIngreso()/100);
+        $venta = parent::darPrecioVenta();
+        if($venta != -1){
+            $venta += $this->getImporteIngreso();
+        }
+        return $venta;
      }
 
      public function __toString(){

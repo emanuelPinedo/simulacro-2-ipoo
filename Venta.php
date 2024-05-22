@@ -63,27 +63,23 @@ class Venta{
         }
     }
 
-    public function mostrarMotos($colMotos){
-        $msj = "";
-        foreach ($colMotos as $moto){
-            $msj .= "\nCódigo: " . $moto->getCodigo() . ", Descripción: " . $moto->getDescripcion();
-        }
-        return $msj;
-    }
-
     public function retornarTotalVentaNacional(){
         $precioVenta = 0;
-        foreach($this->getColMotos() as $colMoto){
+        $motos = $this->getColMotos();
+        foreach($motos as $colMoto){
             if ($colMoto instanceof MotosNacionales){
-                $precioVenta += $colMoto->darPrecioVenta();
+                if($colMoto->darPrecioVenta() != -1){
+                    $precioVenta += $colMoto->darPrecioVenta();
+                }
             }
         }
         return $precioVenta;
     }
 
     public function retornarMotosImportadas(){
+        $motos = $this->getColMotos();
         $colecMotosVendidas = [];
-        foreach($this->getColMotos() as $colMoto){
+        foreach($motos as $colMoto){
             if ($colMoto instanceof MotosImportadas){
                 $colecMotosVendidas[] = $colMoto;
             }
@@ -91,12 +87,21 @@ class Venta{
         return $colecMotosVendidas;
     }
 
+    public function obtenerArray($array){
+        $msj="";
+        foreach($array as $elemento){
+            $msj = $msj . " " . $elemento . "\n";
+        }
+        return $msj;
+    }
+
 
     public function __toString() {
-        return "Número: " . $this->getNumero() . 
+        $arrayMotos = $this->obtenerArray($this->getColMotos());
+        return "Número de Venta: " . $this->getNumero() . 
         "\nFecha: " . $this->getFecha() . 
         "\nCliente: " . $this->getObjCliente()->getNombre() . " " . $this->getObjCliente()->getApellido() . 
-        "\nMotos Vendidas: " . $this->mostrarMotos($this->getColMotos()) . 
+        "\nMotos Vendidas: " . $arrayMotos . 
         "\nPrecio Final: " . $this->getPrecioFinal();
     }
 

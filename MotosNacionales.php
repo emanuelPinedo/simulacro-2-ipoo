@@ -2,9 +2,9 @@
 class MotosNacionales extends Moto{
     private $porcDescNacional;
 
-    public function __construct($vCodigo,$vCosto,$vAnioFabric,$vDescripcion,$vPorcIncAnual,$vActiva,$porcDescNacional){
-        parent::__construct($vCodigo,$vCosto,$vAnioFabric,$vDescripcion,$vPorcIncAnual,$vActiva);
-        $this->porcDescNacional = $porcDescNacional;        
+    public function __construct($vCodigo, $vCosto, $vAnioFabric, $vDescripcion, $vPorcIncAnual, $vActiva,$porcDescNacional){
+        parent::__construct($vCodigo, $vCosto, $vAnioFabric, $vDescripcion, $vPorcIncAnual, $vActiva);
+        $this->porcDescNacional = $porcDescNacional ?? 15;
     }
 
 	public function getPorcDescNacional() {
@@ -16,11 +16,15 @@ class MotosNacionales extends Moto{
 	}
 
 	public function darPrecioVenta(){
-		return parent::darPrecioVenta() * ( 1 - $this->getPorcDescNacional()/100);
+		$venta = parent::darPrecioVenta();
+		if($venta != -1){
+			$desc = ($venta * $this->getPorcDescNacional())/100;
+			$venta = $venta - $desc;
+		}
+		return $venta;
 	 }
  
-	 public function __toString()
-	 {
+	 public function __toString(){
 		 return parent::__toString() .
 		 "\nDescuento: " . $this->getPorcDescNacional();
 	 }

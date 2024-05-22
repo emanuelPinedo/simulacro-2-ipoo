@@ -1,5 +1,5 @@
-<?
-class Moto{
+<?php
+class Moto {
     private $codigo;
     private $costo;
     private $anioFabric;
@@ -7,7 +7,7 @@ class Moto{
     private $porcIncAnual;
     private $activa; //Boolean
 
-    public function __construct($codigo,$costo,$anioFabric,$descripcion,$porcIncAnual,$activa) {
+    public function __construct($codigo,$costo,$anioFabric,$descripcion,$porcIncAnual,$activa){
         $this->codigo = $codigo;
         $this->costo = $costo;
         $this->anioFabric = $anioFabric;
@@ -73,7 +73,7 @@ class Moto{
             $venta = $compra + $compra * ($anioTranscurrido * $this->getPorcIncAnual() / 100);
         }
 
-        return $venta; //si Activa es false entonces retorna 0.
+        return $venta; //si Activa es false entonces retorna -1.
     }
 
     public function __toString() {
@@ -92,3 +92,4 @@ class Moto{
     }
 
 }
+?>

@@ -71,24 +71,19 @@ class Empresa{
     }
     
     public function registrarVenta($colCodigosMoto, $objCliente){
-        $precioTotal = 0;
-        $motosVendidas = [];
-        $ventaNumero = count($this->colecVentas) + 1;
-    
+        $objVenta = new Venta(null, date('Y'), $objCliente, [], 0);
+
         foreach ($colCodigosMoto as $codeMoto) {
             $objMotoCod = $this->retornarMoto($codeMoto);
-            if ($objMotoCod !== null && $objMotoCod->getActiva() && !$objCliente->getEstado()) {
-                $precioTotal += $objMotoCod->darPrecioVenta();
-                $motosVendidas[] = $objMotoCod;
+            if ($objMotoCod !== null && $objMotoCod->getActiva() && $objCliente->getEstado()) {
+                $objVenta->incorporarMoto($objMotoCod);
             }
         }
-    
-        $objVenta = new Venta($ventaNumero, date('Y-m-d'), $objCliente, $motosVendidas, $precioTotal);
-    
+        // modifico array
         $coleccionVentas = $this->getColecVentas();
-        array_push($coleccionVentas, $objVenta);
+        array_push($coleccionVentas,$objVenta);
         $this->setColecVentas($coleccionVentas);
-    
+
         return $objVenta->getPrecioFinal();
     }
 
@@ -96,7 +91,7 @@ class Empresa{
         $ventasCliente = []; //arreglo para almacenar las ventas del cliente
         $ventas = $this->getColecVentas();
         foreach ($ventas as $venta) {
-            $clienteVenta = $venta->getRefCliente();
+            $clienteVenta = $venta->getColecClientes();
             if ($clienteVenta->getTipoDoc() === $tipo &&  $clienteVenta->getNroDoc() === $numDoc ) {
                 //Si el cliente tiene todos esos datos buscados almacenamos la venta.
                 $ventasCliente[] = $venta;
@@ -105,74 +100,25 @@ class Empresa{
         return $ventasCliente;
     }
 
-    public function listadoClientes()
-    {
-        $col = $this->getColecClientes();
-        $contador = count($col);
-        $listado = "";
-
-        for ($i = 0; $i < $contador; $i++) {
-            $clientes = $col[$i];
-            $listado .= $clientes . "\n";
-        }
-        return $listado;
-    }
-
-    public function listadoMotos()
-    {
-        $col = $this->getColecMotos();
-        $contador = count($col);
-        $listado = "";
-
-        for ($i = 0; $i < $contador; $i++) {
-            $motos = $col[$i];
-            $listado .= $motos . "\n";
-        }
-        return $listado;
-    }
-
-    public function listadoVentas()
-    {
-        $col = $this->getColecVentas();
-        $contador = count($col);
-        $listado = "";
-
-        for ($i = 0; $i < $contador; $i++) {
-            foreach ($col[$i] as $venta) {
-                $listado .= $venta . "\n";
-            }
-        }
-        return $listado;
-    }
-
-    public function listadoVentasCliente($cliente)
-    {
-        $ventasCliente = $this->retornarVentasXCliente($cliente->getTipo(), $cliente->getNroDoc()); // obtengo los datos acá invocando al metodo retornar. No puedo usar los get fuera de la clase entonces hago la funcion aca. Concateno
-        $listado = null;
-
-        if ($ventasCliente != null) {
-            $listado = "";
-            foreach ($ventasCliente as $venta) {
-                $listado .= $venta . "\n";
-            }
-        }
-        return $listado;
-    }
-
     public function informarSumaVentasNacionales(){
         $monto = 0;
-        foreach($this->getColecVentas() as $venta){
+        $colecDeVentas = $this->getColecVentas();
+        foreach($colecDeVentas as $venta){
             $monto += $venta->retornarTotalVentaNacional();
         }
         return $monto;
     }
 
     public function informarVentasImportadas(){
-        $ventaImportada = [];
-        foreach($this->getColecVentas() as $venta){
-            $ventaImportada[] = $venta->retornarMotosImportadas();
+        $ventasMotosImportadas = [];
+        $colecDeVentas = $this->getColecVentas();
+        foreach($colecDeVentas as $venta){
+            $motosImportadas = $venta->retornarMotosImportadas();
+            if(count($motosImportadas)>0){
+                $ventasMotosImportadas [] = $venta;
+            }
         }
-        return $ventaImportada;
+        return $ventasMotosImportadas;
     }
 
 
@@ -180,9 +126,18 @@ class Empresa{
         $msj = "\nDatos Empresa:\n";
         $msj .= "Denominación: " . $this->getDenominacion() . "\n";
         $msj .= "Direccion: " . $this->getDireccion() . "\n";
-        $msj .= "Lista Clientes: " . $this->listadoClientes() . "\n";
-        $msj .= "Lista de Motos: " . $this->listadoMotos() . "\n";
-        $msj .= "Lista de Ventas: " . $this->listadoVentas();
+        $msj .= "Lista Clientes: ";
+        foreach($this->getColecClientes() as $clientes){
+            $msj .= "- " . $clientes . "\n";
+        }
+        $msj .= "Lista de Motos: ";
+        foreach($this->getColecMotos() as $motos){
+            $msj .= "- " . $motos . "\n";
+        }
+        $msj .= "Lista de Ventas: ";
+        foreach($this->getColecVentas() as $ventas){
+            $msj .= "- " . $ventas . "\n";
+        }
         
         return $msj;
     }
